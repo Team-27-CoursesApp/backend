@@ -1,0 +1,42 @@
+version: "3"
+services:
+  #  Create a service named db.
+  courses-db:
+    #   Use the Docker Image postgres. This will pull the image from Docker Hub.
+    image: "postgres"
+    #   Give the container the name my_postgres. You can change the name.
+    container_name: "courses_db"
+    restart: always
+    #   Set up the username, password, and database name. You can change the values.
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=#Courses12345
+      - POSTGRES_DB=courses-db
+    #  Map the port 5432 of the container to the port 6543 of the host machine.
+    ports:
+      - "6543:5432"
+    #   Set up a volume to persist the data. The data will be stored in the volume postgres-data.
+    #   I used a named volume. You can use a bind mount.
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - common-model_courses_app_net
+  courses-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: courses_backend
+    ports:
+      - "9091:9091"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://courses_db:5432/courses-db
+      - spring.datasource.password=#Courses12345
+      - spring.jpa.show-sql=false
+    networks:
+      - common-model_courses_app_net
+volumes:
+  postgres-data:
+networks:
+  common-model_courses_app_net:
+    #    external: true
+    driver: bridge
