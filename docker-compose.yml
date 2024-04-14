@@ -21,19 +21,19 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - common-model_courses_app_net
-  courses-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: courses_backend
-    ports:
-      - "9091:9091"
-    environment:
-      - spring.datasource.url=jdbc:postgresql://courses_db:5432/courses-db
-      - spring.datasource.password=#Courses12345
-      - spring.jpa.show-sql=false
-    networks:
-      - common-model_courses_app_net
+#  courses-backend:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: courses_backend
+#    ports:
+#      - "9091:9091"
+#    environment:
+#      - spring.datasource.url=jdbc:postgresql://courses_db:5432/courses-db
+#      - spring.datasource.password=#Courses12345
+#      - spring.jpa.show-sql=false
+#    networks:
+#      - common-model_courses_app_net
 volumes:
   postgres-data:
 networks:
