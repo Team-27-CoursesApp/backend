@@ -2,12 +2,16 @@ package mk.ukim.finki.courses.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -22,4 +26,10 @@ public class Course {
 
     @ManyToMany
     private List<CourseUser> students;
+    public Course(String name, String description, Lecturer lecturer, List<CourseUser> students) {
+        this.name = name;
+        this.description = description;
+        this.lecturer = lecturer;
+        this.students = students;
+    }
 }
