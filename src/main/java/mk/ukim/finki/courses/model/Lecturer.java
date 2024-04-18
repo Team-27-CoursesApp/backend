@@ -17,5 +17,11 @@ public class Lecturer {
     private String email;
 
     private String description;
-
+    public Lecturer() {
+    }
+    public Lecturer(String fullName, String email, String description) {
+        this.fullName = fullName;
+        this.email = email;
+        this.description = description;
+    }
 }
