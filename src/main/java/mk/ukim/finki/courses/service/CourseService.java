@@ -3,23 +3,28 @@ package mk.ukim.finki.courses.service;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CourseService {
 
-    public List<Course> getAllCourses();
+    List<Course> getAllCourses();
 
-    public Optional<Course> getCourseById(Long id);
+    Optional<Course> getCourseById(Long id);
 
-    public Optional<Course> saveCourse(String name, String description, Long lecturer, List<Long> students);
+    Optional<Course> saveCourse(String name, String description, Long lecturer, List<Long> students);
 
-    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer, List<CourseUser> students);
+    Optional<Course> updateCourse(Long id, String name, String description, Long lecturer);
 
-    public void deleteCourse(Long id);
+    Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId);
+    Optional<Course> addStudentToCourse(Long courseId, Long studentId);
 
-    public List<Course> searchCourses(String text);
+    Boolean deleteCourse(Long id);
 
+    List<Course> searchCourses(String text);
 
+    Page<Course> getCoursesFromPage(Pageable pageable);
 }

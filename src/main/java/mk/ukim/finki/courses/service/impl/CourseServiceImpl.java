@@ -10,6 +10,8 @@ import mk.ukim.finki.courses.repository.CourseRepository;
 import mk.ukim.finki.courses.repository.CourseUserRepository;
 import mk.ukim.finki.courses.repository.LecturerRepository;
 import mk.ukim.finki.courses.service.CourseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,23 +41,14 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Optional<Course> getCourseById(Long id) {
-        try {
-            return courseRepository.findById(id);
-        } catch (Exception e) {
-            throw new CourseNotFound(id);
-        }
+        return Optional.ofNullable(courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id)));
     }
 
     @Override
-    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> students) {
-
+    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> studentsId) {
         Lecturer lecturer = lecturerRepository.findById(lecturerId).orElseThrow(() -> new LecturerNotFound(lecturerId));
 
-        List<CourseUser> studentsList = new ArrayList<>();
-
-        for (Long studentId : students) {
-            CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
-        }
+        List<CourseUser> studentsList = addStudents(studentsId);
 
         Course course = new Course(name, description, lecturer, studentsList);
 
@@ -63,24 +56,69 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer, List<CourseUser> students) {
+    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer) {
         Course c = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
-//
-//        c.setName(course.getName());
-//        c.setDescription(course.getDescription());
-//        c.setStudents(course.getStudents());
+
+        c.setName(name);
+        c.setDescription(description);
 
 
         return Optional.of(courseRepository.save(c));
     }
 
     @Override
-    public void deleteCourse(Long id) {
+    public Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
+        List<CourseUser> studentsList = addStudents(studentsId);
+        c.setStudents(studentsList);
+        return Optional.of(courseRepository.save(c));
+    }
 
+    private List<CourseUser> addStudents(List<Long> studentsId) {
+        List<CourseUser> studentsList = new ArrayList<>();
+
+        if (studentsId != null) {
+            for (Long studentId : studentsId) {
+                CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
+                studentsList.add(student);
+            }
+        }
+
+        return studentsList;
+    }
+
+    @Override
+    public Optional<Course> addStudentToCourse(Long courseId, Long studentId) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
+
+        CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
+
+        List<CourseUser> students = c.getStudents();
+
+        students.add(student);
+        c.setStudents(students);
+
+        return Optional.of(courseRepository.save(c));
+    }
+
+
+    @Override
+    public Boolean deleteCourse(Long id) {
+        Course course = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
+        if (course == null) {
+            return false;
+        }
+        courseRepository.delete(course);
+        return true;
     }
 
     @Override
     public List<Course> searchCourses(String text) {
-        return null;
+        return courseRepository.findAllByNameLikeOrDescriptionLike(text, text);
+    }
+
+    @Override
+    public Page<Course> getCoursesFromPage(Pageable pageable) {
+        return courseRepository.findAll(pageable);
     }
 }
