@@ -2,6 +2,7 @@ package mk.ukim.finki.courses.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import mk.ukim.finki.courses.model.enumerations.Role;
 
 import java.util.List;
 
@@ -31,4 +32,19 @@ public class CourseUser {
     @ManyToMany
     private List<Course> ownedCourses;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public CourseUser(String username, String email, String password, String name, String surname, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.surname = surname;
+        this.role = role;
+    }
+
+    public CourseUser() {
+
+    }
 }
