@@ -3,6 +3,7 @@ package mk.ukim.finki.courses.service;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
+import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,4 +28,6 @@ public interface CourseService {
     List<Course> searchCourses(String text);
 
     Page<Course> getCoursesFromPage(Pageable pageable);
+
+    List<Course> findAllByCategory(CourseCategory category);
 }

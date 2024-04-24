@@ -2,6 +2,7 @@ package mk.ukim.finki.courses.web.rest;
 
 
 import mk.ukim.finki.courses.model.Course;
+import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import mk.ukim.finki.courses.service.CourseService;
 import org.aspectj.lang.annotation.RequiredTypes;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ import java.util.List;
 public class CourseController {
 
     private final CourseService courseService;
+
+
 
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
@@ -75,5 +78,9 @@ public class CourseController {
                                                @RequestParam Long lecturerId) {
         return ResponseEntity.ok(courseService.updateCourse(courseId, name, description, lecturerId).get());
     }
-
+    @GetMapping("/categories/{category}")
+    public ResponseEntity<List<Course>> listByCategories(@PathVariable("category") CourseCategory category) {
+        List<Course> courses = courseService.findAllByCategory(category);
+        return ResponseEntity.ok(courses);
+    }
 }

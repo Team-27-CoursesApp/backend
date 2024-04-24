@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class Course {
 
     @ManyToMany
     private List<CourseUser> students;
+
+    CourseCategory category;
+
     public Course(String name, String description, Lecturer lecturer, List<CourseUser> students) {
         this.name = name;
         this.description = description;

@@ -3,6 +3,7 @@ package mk.ukim.finki.courses.service.impl;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
+import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import mk.ukim.finki.courses.model.exceptions.CourseNotFound;
 import mk.ukim.finki.courses.model.exceptions.CourseUserNotFound;
 import mk.ukim.finki.courses.model.exceptions.LecturerNotFound;
@@ -120,5 +121,10 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<Course> getCoursesFromPage(Pageable pageable) {
         return courseRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Course> findAllByCategory(CourseCategory category) {
+        return courseRepository.findAllByCategory(category);
     }
 }
