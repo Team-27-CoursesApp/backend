@@ -1,5 +1,6 @@
 package mk.ukim.finki.courses.service.impl;
 
+import jdk.jfr.Category;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
@@ -46,22 +47,25 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> studentsId) {
+    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> studentsId,CourseCategory category) {
         Lecturer lecturer = lecturerRepository.findById(lecturerId).orElseThrow(() -> new LecturerNotFound(lecturerId));
 
         List<CourseUser> studentsList = addStudents(studentsId);
 
-        Course course = new Course(name, description, lecturer, studentsList);
+        Course course = new Course(name, description, lecturer, studentsList,category);
 
         return Optional.of(courseRepository.save(course));
     }
 
     @Override
-    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer) {
+    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer, CourseCategory category) {
         Course c = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
+        Lecturer lecturer1=lecturerRepository.findById(lecturer).orElseThrow(() -> new LecturerNotFound(lecturer));
 
         c.setName(name);
         c.setDescription(description);
+        c.setCategory(category);
+        c.setLecturer(lecturer1);
 
 
         return Optional.of(courseRepository.save(c));

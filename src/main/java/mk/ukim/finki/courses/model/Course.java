@@ -30,10 +30,11 @@ public class Course {
 
     CourseCategory category;
 
-    public Course(String name, String description, Lecturer lecturer, List<CourseUser> students) {
+    public Course(String name, String description, Lecturer lecturer, List<CourseUser> students,CourseCategory category) {
         this.name = name;
         this.description = description;
         this.lecturer = lecturer;
         this.students = students;
+        this.category=category;
     }
 }

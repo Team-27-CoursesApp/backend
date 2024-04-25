@@ -4,6 +4,8 @@ package mk.ukim.finki.courses.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
 public class Lecturer {
@@ -17,6 +19,9 @@ public class Lecturer {
     private String email;
 
     private String description;
+
+    @OneToMany
+    List<CourseUser> teaches;
     public Lecturer() {
     }
     public Lecturer(String fullName, String email, String description) {

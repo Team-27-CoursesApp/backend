@@ -1,5 +1,6 @@
 package mk.ukim.finki.courses.service.impl;
 
+import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.enumerations.Role;
 import mk.ukim.finki.courses.model.exceptions.CourseUserNotFound;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class CourseUserServiceImpl implements CourseUserService, UserDetailsService {
@@ -35,5 +37,13 @@ public class CourseUserServiceImpl implements CourseUserService, UserDetailsServ
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         CourseUser courseUser = courseUserRepository.findByUsername(username).orElseThrow(CourseUserNotFound::new);
         return new User(courseUser.getUsername(), courseUser.getPassword(), Collections.singletonList(courseUser.getRole()));
+    }
+
+    @Override
+    public List<Course> getUserCourses(String username) {
+        CourseUser user=courseUserRepository.findByUsername(username).orElseThrow(CourseUserNotFound::new);
+        List<Course> myCourses=user.getOwnedCourses();
+
+        return myCourses;
     }
 }

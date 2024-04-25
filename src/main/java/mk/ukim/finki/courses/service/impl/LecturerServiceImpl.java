@@ -1,5 +1,6 @@
 package mk.ukim.finki.courses.service.impl;
 
+import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
 import mk.ukim.finki.courses.model.exceptions.LecturerNotFound;
 import mk.ukim.finki.courses.repository.CourseRepository;
@@ -22,7 +23,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public List<Lecturer> getAllCourses() {
+    public List<Lecturer> getAllLecturers() {
         return lecturerRepository.findAll();
     }
 
@@ -33,10 +34,10 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public Lecturer createLecturer(String fullname, String email, String description) {
+    public Optional<Lecturer> createLecturer(String fullname, String email, String description) {
         Lecturer lecturer=new Lecturer(fullname,email,description);
 
-        return lecturerRepository.save(lecturer);
+        return Optional.of(lecturerRepository.save(lecturer));
     }
 
     @Override
@@ -59,5 +60,12 @@ public class LecturerServiceImpl implements LecturerService {
     public List<Lecturer> findLecturerByName(String fullname) {
 
         return lecturerRepository.findAllByFullNameContaining(fullname);
+    }
+
+    @Override
+    public List<CourseUser> getTeaches(Long id) {
+        Lecturer lecturer=lecturerRepository.findById(id).orElseThrow(() -> new LecturerNotFound(id));
+        List<CourseUser> teaches=lecturer.getTeaches();
+        return teaches;
     }
 }

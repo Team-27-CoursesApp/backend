@@ -67,16 +67,18 @@ public class CourseController {
     public ResponseEntity<Course> addCourse(@RequestParam String name,
                                              @RequestParam String description,
                                              @RequestParam Long lecturer,
-                                             @RequestParam(required = false) List<Long> students) {
-        return ResponseEntity.ok(courseService.saveCourse(name, description, lecturer, students).get());
+                                             @RequestParam(required = false) List<Long> students,
+                                            @RequestParam CourseCategory category) {
+        return ResponseEntity.ok(courseService.saveCourse(name, description, lecturer, students,category).get());
     }
 
     @PostMapping("/update/{courseId}")
     public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
                                                @RequestParam String name,
                                                @RequestParam String description,
-                                               @RequestParam Long lecturerId) {
-        return ResponseEntity.ok(courseService.updateCourse(courseId, name, description, lecturerId).get());
+                                               @RequestParam Long lecturerId,
+                                            @RequestParam CourseCategory category) {
+        return ResponseEntity.ok(courseService.updateCourse(courseId, name, description, lecturerId,category).get());
     }
     @GetMapping("/categories/{category}")
     public ResponseEntity<List<Course>> listByCategories(@PathVariable("category") CourseCategory category) {

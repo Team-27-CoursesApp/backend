@@ -16,9 +16,9 @@ public interface CourseService {
 
     Optional<Course> getCourseById(Long id);
 
-    Optional<Course> saveCourse(String name, String description, Long lecturer, List<Long> students);
+    Optional<Course> saveCourse(String name, String description, Long lecturer, List<Long> students, CourseCategory category);
 
-    Optional<Course> updateCourse(Long id, String name, String description, Long lecturer);
+    Optional<Course> updateCourse(Long id, String name, String description, Long lecturer,CourseCategory category);
 
     Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId);
     Optional<Course> addStudentToCourse(Long courseId, Long studentId);
