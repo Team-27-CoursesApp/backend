@@ -131,4 +131,6 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> findAllByCategory(CourseCategory category) {
         return courseRepository.findAllByCategory(category);
     }
+
+
 }

@@ -30,4 +30,6 @@ public interface CourseService {
     Page<Course> getCoursesFromPage(Pageable pageable);
 
     List<Course> findAllByCategory(CourseCategory category);
+
+
 }

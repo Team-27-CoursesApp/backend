@@ -21,7 +21,7 @@ public interface LecturerService {
 
     public List<Lecturer> findLecturerByName(String fullname);
 
-    public List<CourseUser> getTeaches(Long id);
+    public List<Course> getTeaches(Long id);
 
 
 }

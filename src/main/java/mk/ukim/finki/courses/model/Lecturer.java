@@ -21,7 +21,7 @@ public class Lecturer {
     private String description;
 
     @OneToMany
-    List<CourseUser> teaches;
+    List<Course> teaches;
     public Lecturer() {
     }
     public Lecturer(String fullName, String email, String description) {

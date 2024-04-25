@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -30,4 +31,5 @@ public class CourseUserController {
     public ResponseEntity<List<Course>> getAllMyCourses(@PathVariable String username) {
         return ResponseEntity.ok(courseUserService.getUserCourses(username));
     }
+
 }
