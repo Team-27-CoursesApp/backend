@@ -22,4 +22,9 @@ public class ShoppingCart {
     private ShoppingCartStatus status;
 
     private LocalDateTime dateCreated;
+
+    @OneToOne
+    private CourseUser user;
+
+    private Double totalPrice;
 }

@@ -19,8 +19,11 @@ public class Course {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    String name;
-    String description;
+    private String name;
+
+    private String description;
+
+    private Double price;
 
     @ManyToOne
     private Lecturer lecturer;
@@ -28,14 +31,13 @@ public class Course {
     @ManyToMany
     private List<CourseUser> students;
 
+    @Enumerated(EnumType.STRING)
     CourseCategory category;
 
-
-
-
-    public Course(String name, String description, Lecturer lecturer, List<CourseUser> students,CourseCategory category) {
+    public Course(String name, String description, Double price, Lecturer lecturer, List<CourseUser> students,CourseCategory category) {
         this.name = name;
         this.description = description;
+        this.price = price;
         this.lecturer = lecturer;
         this.students = students;
         this.category=category;

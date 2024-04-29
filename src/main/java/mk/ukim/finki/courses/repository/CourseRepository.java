@@ -13,5 +13,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findAllByNameLikeOrDescriptionLike(String name, String description);
     List<Course> findAllByCategory(CourseCategory category);
-    Optional<Course> findCourseByStudentsIs(String username);
+    // Optional<Course> findCourseByStudentsIs(String username);
 }
