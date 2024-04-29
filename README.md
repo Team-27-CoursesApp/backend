@@ -32,7 +32,7 @@ The backend API will be available at http://localhost:9091
 ## Demo JSON
 
 ```
-1. http://localhost:9091/api/courses/all
+1. GET http://localhost:9091/api/courses/all
 
 [
     {
@@ -44,7 +44,7 @@ The backend API will be available at http://localhost:9091
     }
 ]
 
-2. http://localhost:9091/api/lecturers/all
+2. GET http://localhost:9091/api/lecturers/all
 
 [
     {
