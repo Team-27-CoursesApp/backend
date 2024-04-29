@@ -28,10 +28,8 @@ public class Course {
     @ManyToMany
     private List<CourseUser> students;
 
+    @Enumerated(EnumType.STRING)
     CourseCategory category;
-
-
-
 
     public Course(String name, String description, Lecturer lecturer, List<CourseUser> students,CourseCategory category) {
         this.name = name;

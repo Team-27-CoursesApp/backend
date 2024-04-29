@@ -2,6 +2,7 @@ package mk.ukim.finki.courses.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
@@ -28,5 +29,12 @@ public class Lecturer {
         this.fullName = fullName;
         this.email = email;
         this.description = description;
+    }
+
+    public Lecturer(String fullName, String email, String description, List<Course> teaches) {
+        this.fullName = fullName;
+        this.email = email;
+        this.description = description;
+        this.teaches = teaches;
     }
 }

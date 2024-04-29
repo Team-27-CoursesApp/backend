@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface LecturerRepository extends JpaRepository<Lecturer, Long> {
-
-    public List<Lecturer> findAllByFullNameContaining(String name);
+    List<Lecturer> findAllByFullNameContaining(String name);
 }

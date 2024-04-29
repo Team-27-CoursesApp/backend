@@ -1,9 +1,9 @@
 package mk.ukim.finki.courses.service.impl;
 
-import jdk.jfr.Category;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
 import mk.ukim.finki.courses.model.Lecturer;
+import mk.ukim.finki.courses.model.dto.CourseDto;
 import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import mk.ukim.finki.courses.model.exceptions.CourseNotFound;
 import mk.ukim.finki.courses.model.exceptions.CourseUserNotFound;
@@ -37,8 +37,23 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public List<CourseDto> getAllCourses() {
+        List<Course> courses = this.courseRepository.findAll();
+        List<CourseDto> coursesDto = new ArrayList<>();
+        for(Course course : courses){
+            CourseDto courseDto = new CourseDto();
+            courseDto.setCategory(course.getCategory().toString());
+            courseDto.setName(course.getName());
+            courseDto.setDescription(course.getDescription());
+            courseDto.setLecturer(course.getLecturer().getId());
+            List<Long> studentIds = new ArrayList<>();
+            for(CourseUser student : course.getStudents()){
+                studentIds.add(student.getId());
+            }
+            courseDto.setStudents(studentIds);
+            coursesDto.add(courseDto);
+        }
+        return coursesDto;
     }
 
     @Override
@@ -47,32 +62,36 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> studentsId,CourseCategory category) {
-        Lecturer lecturer = lecturerRepository.findById(lecturerId).orElseThrow(() -> new LecturerNotFound(lecturerId));
-
-        List<CourseUser> studentsList = addStudents(studentsId);
-
-        Course course = new Course(name, description, lecturer, studentsList,category);
-
-        return Optional.of(courseRepository.save(course));
+    public Optional<Course> saveCourse(CourseDto courseDto) throws LecturerNotFound {
+        Lecturer lecturer = this.lecturerRepository.findById(courseDto.getLecturer()).orElseThrow(()-> new LecturerNotFound(courseDto.getLecturer()));
+        List<CourseUser> studentsList = addStudents(courseDto.getStudents());
+        Course course = new Course(
+                courseDto.getName(),
+                courseDto.getDescription(),
+                lecturer,
+                studentsList,
+                CourseCategory.valueOf(courseDto.getCategory())
+        );
+        return Optional.of(this.courseRepository.save(course));
     }
 
     @Override
-    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer, CourseCategory category) {
-        Course c = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
-        Lecturer lecturer1=lecturerRepository.findById(lecturer).orElseThrow(() -> new LecturerNotFound(lecturer));
+    public Optional<Course> updateCourse(Long id, CourseDto courseDto) throws CourseNotFound,LecturerNotFound {
+        Course course = this.courseRepository.findById(id).orElseThrow(()->new CourseNotFound(id));
+        Lecturer lecturer = this.lecturerRepository.findById(courseDto.getLecturer()).orElseThrow(()-> new LecturerNotFound(courseDto.getLecturer()));
+        List<CourseUser> studentsList = addStudents(courseDto.getStudents());
 
-        c.setName(name);
-        c.setDescription(description);
-        c.setCategory(category);
-        c.setLecturer(lecturer1);
+        course.setName(courseDto.getName());
+        course.setDescription(courseDto.getDescription());
+        course.setLecturer(lecturer);
+        course.setStudents(studentsList);
+        course.setCategory(CourseCategory.valueOf(courseDto.getCategory()));
 
-
-        return Optional.of(courseRepository.save(c));
+        return Optional.of(this.courseRepository.save(course));
     }
 
     @Override
-    public Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId) {
+    public Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId) throws CourseNotFound{
         Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
         List<CourseUser> studentsList = addStudents(studentsId);
         c.setStudents(studentsList);
@@ -93,7 +112,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Optional<Course> addStudentToCourse(Long courseId, Long studentId) {
+    public Optional<Course> addStudentToCourse(Long courseId, Long studentId) throws CourseNotFound,CourseUserNotFound {
         Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
 
         CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
@@ -105,7 +124,6 @@ public class CourseServiceImpl implements CourseService {
 
         return Optional.of(courseRepository.save(c));
     }
-
 
     @Override
     public Boolean deleteCourse(Long id) {
@@ -131,6 +149,4 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> findAllByCategory(CourseCategory category) {
         return courseRepository.findAllByCategory(category);
     }
-
-
 }

@@ -2,9 +2,9 @@ package mk.ukim.finki.courses.web.rest;
 
 
 import mk.ukim.finki.courses.model.Course;
+import mk.ukim.finki.courses.model.dto.CourseDto;
 import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import mk.ukim.finki.courses.service.CourseService;
-import org.aspectj.lang.annotation.RequiredTypes;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +18,31 @@ public class CourseController {
 
     private final CourseService courseService;
 
-
-
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Course>> getAllCourses() {
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseService.getCourseById(courseId).get());
+        try{
+            return this.courseService.getCourseById(courseId)
+                    .map(course -> ResponseEntity.ok().body(course))
+                    .orElseGet(()->ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @DeleteMapping("/delete/{courseId}")
     public ResponseEntity<Boolean> deleteCourse(@PathVariable Long courseId) {
+        if(this.courseService.getCourseById(courseId).isEmpty()){
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(courseService.deleteCourse(courseId));
     }
 
@@ -52,34 +58,28 @@ public class CourseController {
         return ResponseEntity.ok(courseService.searchCourses(text));
     }
 
-    @PostMapping("/addStudent/{courseId}/{studentId}")
-    public ResponseEntity<Course> addStudentToCourse(@PathVariable Long courseId, @PathVariable Long studentId) {
-        return ResponseEntity.ok(courseService.addStudentToCourse(courseId, studentId).get());
-    }
-
-    @PostMapping("/addStudents/{courseId}/{students}")
-    public ResponseEntity<Course> addStudentsToCourse(@PathVariable Long courseId, @PathVariable List<Long> students) {
-        return ResponseEntity.ok(courseService.addStudentsToCourse(courseId, students).get());
-    }
-
-
     @PostMapping("/add")
-    public ResponseEntity<Course> addCourse(@RequestParam String name,
-                                             @RequestParam String description,
-                                             @RequestParam Long lecturer,
-                                             @RequestParam(required = false) List<Long> students,
-                                            @RequestParam CourseCategory category) {
-        return ResponseEntity.ok(courseService.saveCourse(name, description, lecturer, students,category).get());
+    public ResponseEntity<Course> addCourse(@RequestBody CourseDto courseDto){
+        try{
+            return this.courseService.saveCourse(courseDto)
+                    .map(course -> ResponseEntity.ok().body(course))
+                    .orElseGet(()->ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PostMapping("/update/{courseId}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
-                                               @RequestParam String name,
-                                               @RequestParam String description,
-                                               @RequestParam Long lecturerId,
-                                            @RequestParam CourseCategory category) {
-        return ResponseEntity.ok(courseService.updateCourse(courseId, name, description, lecturerId,category).get());
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody CourseDto courseDto){
+        try{
+            return this.courseService.updateCourse(id,courseDto)
+                    .map(course -> ResponseEntity.ok().body(course))
+                    .orElseGet(()->ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
+
     @GetMapping("/categories/{category}")
     public ResponseEntity<List<Course>> listByCategories(@PathVariable("category") CourseCategory category) {
         List<Course> courses = courseService.findAllByCategory(category);

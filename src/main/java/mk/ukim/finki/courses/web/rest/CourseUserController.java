@@ -1,6 +1,7 @@
 package mk.ukim.finki.courses.web.rest;
 
 import mk.ukim.finki.courses.model.Course;
+
 import mk.ukim.finki.courses.service.CourseService;
 import mk.ukim.finki.courses.service.CourseUserService;
 import mk.ukim.finki.courses.service.LecturerService;
@@ -8,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/api/user")
 public class CourseUserController {
@@ -19,7 +18,6 @@ public class CourseUserController {
     private final CourseService courseService;
 
     private final LecturerService lecturerService;
-
 
     public CourseUserController(CourseUserService courseUserService, CourseService courseService, LecturerService lecturerService) {
         this.courseUserService = courseUserService;
@@ -31,5 +29,4 @@ public class CourseUserController {
     public ResponseEntity<List<Course>> getAllMyCourses(@PathVariable String username) {
         return ResponseEntity.ok(courseUserService.getUserCourses(username));
     }
-
 }
