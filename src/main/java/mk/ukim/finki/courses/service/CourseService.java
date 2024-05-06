@@ -1,8 +1,11 @@
 package mk.ukim.finki.courses.service;
 
+import mk.ukim.finki.courses.model.Category;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
-import mk.ukim.finki.courses.model.Lecturer;
+import mk.ukim.finki.courses.model.DTO.CourseDto;
+import mk.ukim.finki.courses.model.DTO.PaginatedCourseDto;
+import mk.ukim.finki.courses.model.DTO.UserDto;
 import mk.ukim.finki.courses.model.enumerations.CourseCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,20 +19,10 @@ public interface CourseService {
 
     Optional<Course> getCourseById(Long id);
 
-    Optional<Course> saveCourse(String name, String description, Long lecturer, List<Long> students, CourseCategory category);
-
-    Optional<Course> updateCourse(Long id, String name, String description, Long lecturer,CourseCategory category);
-
-    Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId);
-    Optional<Course> addStudentToCourse(Long courseId, Long studentId);
-
+    Optional<Course> saveCourse(UserDto user,CourseDto course);
+    CourseUser addStudentToCourse(Long courseId, Long userId);
     Boolean deleteCourse(Long id);
-
     List<Course> searchCourses(String text);
-
-    Page<Course> getCoursesFromPage(Pageable pageable);
-
-    List<Course> findAllByCategory(CourseCategory category);
-
+    PaginatedCourseDto findByCategory(Long categoryId, int page);
 
 }
