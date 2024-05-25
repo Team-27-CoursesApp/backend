@@ -80,14 +80,15 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> searchCourses(String text) {
-        return null;
+        return this.courseRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text,text).stream().limit(5).collect(Collectors.toList());
+
     }
 
     @Override
     public PaginatedCourseDto findByCategory(Long categoryId, int page) {
         int pageSize = 12;
         Category category = this.categoryRepository.findById(categoryId).orElseThrow(()->new CategoryNotFound(categoryId));
-        List<Course>allCourses = this.courseRepository.findByCategory(category);
+        List<Course>allCourses = this.courseRepository.findByCategoryOrderByIdAsc(category);
         List<Course>currentPage = allCourses.stream().skip((long) (page - 1) * pageSize).limit(pageSize).toList();
         int pages = allCourses.size() / pageSize;
         if((float)allCourses.size() / pageSize > pages){

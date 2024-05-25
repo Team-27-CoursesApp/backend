@@ -62,16 +62,19 @@ public class CourseController {
 
 
 
-//    // pagination
+
+
+
+    @GetMapping("/search/{text}")
+    public List<Course> searchCourses(@PathVariable String text) {
+        return courseService.searchCourses(text);
+    }
+
+    //    // pagination
 //    @GetMapping("/page/{page}/size/{size}")
 //    public ResponseEntity<Page<Course>> getCoursesPage(@PathVariable int page, @PathVariable int size) {
 //        PageRequest pageRequest = PageRequest.of(page, size);
 //        return ResponseEntity.ok(courseService.getCoursesFromPage(pageRequest));
-//    }
-
-//    @GetMapping("/search/{text}")
-//    public ResponseEntity<List<Course>> searchCourses(@PathVariable String text) {
-//        return ResponseEntity.ok(courseService.searchCourses(text));
 //    }
 
 //    @PostMapping("/addStudent/{courseId}/{studentId}")

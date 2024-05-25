@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
     Optional<Course> findByName(String name);
-    List<Course> findByCategory(Category category);
+    List<Course> findByCategoryOrderByIdAsc(Category category);
+    List<Course>findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
 }
