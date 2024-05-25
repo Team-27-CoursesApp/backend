@@ -33,6 +33,6 @@ jobs:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: Deploy
           service-name: skillsphere-app
-          app-name: skillsphere-app
+          app-name: springboot-app
           use-staging-deployment: false
           package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
