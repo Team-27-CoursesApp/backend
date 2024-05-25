@@ -28,6 +28,7 @@ The backend API will be available at http://localhost:9091
 * Thymeleaf
 * PostgreSQL
 * Docker
+* Azure Spring App
 
 License
 This project is licensed under the MIT License.
