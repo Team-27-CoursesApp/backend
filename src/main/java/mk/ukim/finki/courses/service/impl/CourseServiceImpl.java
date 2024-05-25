@@ -1,16 +1,19 @@
 package mk.ukim.finki.courses.service.impl;
 
-import jdk.jfr.Category;
+import mk.ukim.finki.courses.model.Category;
 import mk.ukim.finki.courses.model.Course;
 import mk.ukim.finki.courses.model.CourseUser;
-import mk.ukim.finki.courses.model.Lecturer;
+import mk.ukim.finki.courses.model.DTO.CourseDto;
+import mk.ukim.finki.courses.model.DTO.PaginatedCourseDto;
+import mk.ukim.finki.courses.model.DTO.UserDto;
 import mk.ukim.finki.courses.model.enumerations.CourseCategory;
+import mk.ukim.finki.courses.model.exceptions.CategoryNotFound;
 import mk.ukim.finki.courses.model.exceptions.CourseNotFound;
 import mk.ukim.finki.courses.model.exceptions.CourseUserNotFound;
 import mk.ukim.finki.courses.model.exceptions.LecturerNotFound;
+import mk.ukim.finki.courses.repository.CategoryRepository;
 import mk.ukim.finki.courses.repository.CourseRepository;
 import mk.ukim.finki.courses.repository.CourseUserRepository;
-import mk.ukim.finki.courses.repository.LecturerRepository;
 import mk.ukim.finki.courses.service.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -26,14 +30,13 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
 
-    private final LecturerRepository lecturerRepository;
-
     private final CourseUserRepository courseUserRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository, LecturerRepository lecturerRepository, CourseUserRepository courseUserRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, CourseUserRepository courseUserRepository, CategoryRepository categoryRepository) {
         this.courseRepository = courseRepository;
-        this.lecturerRepository = lecturerRepository;
         this.courseUserRepository = courseUserRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -43,94 +46,54 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Optional<Course> getCourseById(Long id) {
-        return Optional.ofNullable(courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id)));
+        return this.courseRepository.findById(id);
     }
 
     @Override
-    public Optional<Course> saveCourse(String name, String description, Long lecturerId, List<Long> studentsId,CourseCategory category) {
-        Lecturer lecturer = lecturerRepository.findById(lecturerId).orElseThrow(() -> new LecturerNotFound(lecturerId));
-
-        List<CourseUser> studentsList = addStudents(studentsId);
-
-        Course course = new Course(name, description, lecturer, studentsList,category);
-
-        return Optional.of(courseRepository.save(course));
+    public Optional<Course> saveCourse(UserDto user, CourseDto course) {
+        Category category = this.categoryRepository.findById(course.getCategory()).orElseThrow(()->new CourseUserNotFound());
+        Course c = this.courseRepository.save(new Course(
+                course.getName(),
+                course.getDescription(),
+                course.getLecturer(),
+                category,
+                course.getImageUrl(),
+                course.getVideoUrl(),
+                course.getPrice()));
+        this.addStudentToCourse(c.getId(),user.getId());
+        return Optional.of(c);
     }
+
 
     @Override
-    public Optional<Course> updateCourse(Long id, String name, String description, Long lecturer, CourseCategory category) {
-        Course c = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
-        Lecturer lecturer1=lecturerRepository.findById(lecturer).orElseThrow(() -> new LecturerNotFound(lecturer));
-
-        c.setName(name);
-        c.setDescription(description);
-        c.setCategory(category);
-        c.setLecturer(lecturer1);
-
-
-        return Optional.of(courseRepository.save(c));
+    public CourseUser addStudentToCourse(Long courseId, Long userId) {
+        Course course = this.courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
+        CourseUser courseUser = this.courseUserRepository.findById(userId).orElseThrow(() -> new CourseUserNotFound(userId));
+        courseUser.getCourses().add(course);
+        return this.courseUserRepository.save(courseUser);
     }
-
-    @Override
-    public Optional<Course> addStudentsToCourse(Long courseId, List<Long> studentsId) {
-        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
-        List<CourseUser> studentsList = addStudents(studentsId);
-        c.setStudents(studentsList);
-        return Optional.of(courseRepository.save(c));
-    }
-
-    private List<CourseUser> addStudents(List<Long> studentsId) {
-        List<CourseUser> studentsList = new ArrayList<>();
-
-        if (studentsId != null) {
-            for (Long studentId : studentsId) {
-                CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
-                studentsList.add(student);
-            }
-        }
-
-        return studentsList;
-    }
-
-    @Override
-    public Optional<Course> addStudentToCourse(Long courseId, Long studentId) {
-        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CourseNotFound(courseId));
-
-        CourseUser student = courseUserRepository.findById(studentId).orElseThrow(() -> new CourseUserNotFound(studentId));
-
-        List<CourseUser> students = c.getStudents();
-
-        students.add(student);
-        c.setStudents(students);
-
-        return Optional.of(courseRepository.save(c));
-    }
-
 
     @Override
     public Boolean deleteCourse(Long id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new CourseNotFound(id));
-        if (course == null) {
-            return false;
-        }
-        courseRepository.delete(course);
-        return true;
+        return null;
     }
 
     @Override
     public List<Course> searchCourses(String text) {
-        return courseRepository.findAllByNameLikeOrDescriptionLike(text, text);
+        return null;
     }
 
     @Override
-    public Page<Course> getCoursesFromPage(Pageable pageable) {
-        return courseRepository.findAll(pageable);
+    public PaginatedCourseDto findByCategory(Long categoryId, int page) {
+        int pageSize = 12;
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(()->new CategoryNotFound(categoryId));
+        List<Course>allCourses = this.courseRepository.findByCategory(category);
+        List<Course>currentPage = allCourses.stream().skip((long) (page - 1) * pageSize).limit(pageSize).toList();
+        int pages = allCourses.size() / pageSize;
+        if((float)allCourses.size() / pageSize > pages){
+            pages+=1;
+        }
+        return new PaginatedCourseDto(page,pages,currentPage);
     }
-
-    @Override
-    public List<Course> findAllByCategory(CourseCategory category) {
-        return courseRepository.findAllByCategory(category);
-    }
-
 
 }
